@@ -2,14 +2,20 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "newStorageAccountName": {
+      "value": "ARMTestStorageAcct"
+    },
     "adminUsername": {
-      "value": "GEN-USER"
+      "value": "parks65"
     },
     "adminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "Caviar!60062"
     },
     "dnsLabelPrefix": {
-      "value": "GEN-UNIQUE"
+      "value": "armtest65"
+    },
+    "location": {
+      "value": "South Central US"
     }
   }
 }
