@@ -33,6 +33,12 @@
                 "description": "The prefix for the first subnet in the VNET."
             }
         },
+        "dnsAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "The DNS Server address."
+            }
+        },
         "gwSubnetAddrPrefix": {
             "type": "string",
             "metadata": {
@@ -121,12 +127,17 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2015-06-15",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('securityGroupName'))]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('secGroup1Name'))]"
             ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
                         "[parameters('addressSpace')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "[parameters('dnsAddress')]"
                     ]
                 },
                 "subnets": [

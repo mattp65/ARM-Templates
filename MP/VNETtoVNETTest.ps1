@@ -15,15 +15,15 @@ if (!$Account) {
 Write-Output 'Setting the Subscription'
 $subout = Get-AzureRmSubscription -SubscriptionName $SubscriptionName -TenantId $TenantId  | Select-AzureRmSubscription
 
-$adminUsername =  'parks65'
+$adminUsername = 'parks65'
 $adminPassword = ConvertTo-SecureString 'Caviar!60062' -AsPlainText -Force
 
 $deploymentName = 'NetworkARM'
 
-$templatePath = 'C:\GitHub\ARM-Templates\MP\VNET_1Subnet.json'
+$templatePath = 'C:\GitHub\ARM-Templates\MP\VNETtoVNET.json'
 
 $location = 'East US'
-$resourceGroup = 'NetworkRGCompZ'
+$resourceGroup = 'NetworkRGCompA'
 
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
 
@@ -33,21 +33,15 @@ New-AzureRmResourceGroup -Name $resourceGroup -Location $location -Verbose -Forc
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
 
 $parameters = @{
-    'virtualNetworkName' = 'VNetCompZ';
-    'addressSpace' = '10.1.0.0/16';
-    'secGroup1Name' = 'SecGroupCompZFE';
-    'subnet1Name' = 'Core';
-    'subnet1AddrPrefix' = '10.1.0.0/24';
-    'dnsAddress' = '10.1.0.10';
-    'gwSubnetAddrPrefix' = '10.1.255.0/27';
-    'gatewayName' = 'VNetCompZGW';
-    'gatewayPublicIPName' = 'VNetCompZGWIP';
-    'gatewayIPConf' = 'VNetCompZGWIPConf'
+    'Shared Key' = 'DXCDynamics!2017';
+    'location1' = 'East US';
+    'location2' = 'East US';
+    'gateway1Name' = 'VNetCompZGW';
+    'gateway2Name' = 'VNetCompAGW';
+    'conn1Name' = 'ConnVNetCompZtoVNetCompA';
+    'conn2Name' = 'ConnVNetCompAtoVNetCompZ'
 }
 
 New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroup -TemplateFile $templatePath -TemplateParameterObject $parameters 
 
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
-
-
-

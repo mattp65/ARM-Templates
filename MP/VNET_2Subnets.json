@@ -52,6 +52,12 @@
                 "description": "The prefix for the second subnet in the VNET."
             }
         },
+        "dnsAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "The DNS Server address."
+            }
+        },
         "gwSubnetAddrPrefix": {
             "type": "string",
             "metadata": {
@@ -90,7 +96,7 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "webrule",
+                        "name": "Int_http",
                         "properties": {
                             "description": "This rule allows HTTP traffic in on port 80",
                             "protocol": "Tcp",
@@ -104,7 +110,7 @@
                         }
                     },
                     {
-                        "name": "httpsrule",
+                        "name": "Int_https",
                         "properties": {
                             "description": "This rule allows HTTPS traffic in on port 443",
                             "protocol": "Tcp",
@@ -118,7 +124,7 @@
                         }
                     },
                     {
-                        "name": "rdprule",
+                        "name": "Int_rdp",
                         "properties": {
                             "description": "This rule allows RDP traffic on port 3389 from the web",
                             "protocol": "Tcp",
@@ -142,7 +148,7 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "sql",
+                        "name": "FE_sql",
                         "properties": {
                             "description": "This rule allows traffic in on port 1433",
                             "protocol": "Tcp",
@@ -152,6 +158,20 @@
                             "destinationAddressPrefix": "[parameters('subnet2AddrPrefix')]",
                             "access": "Allow",
                             "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "FE_Block",
+                        "properties": {
+                            "description": "This rule blocks all remainging traffic from the FE",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "destinationAddressPrefix": "[parameters('subnet2AddrPrefix')]",
+                            "access": "Deny",
+                            "priority": 500,
                             "direction": "Inbound"
                         }
                     }
@@ -164,12 +184,18 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2015-06-15",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('securityGroupName'))]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('secGroup1Name'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('secGroup2Name'))]"
             ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
                         "[parameters('addressSpace')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "[parameters('dnsAddress')]"
                     ]
                 },
                 "subnets": [

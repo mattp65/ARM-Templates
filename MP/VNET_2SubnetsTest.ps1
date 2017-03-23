@@ -20,10 +20,10 @@ $adminPassword = ConvertTo-SecureString 'Caviar!60062' -AsPlainText -Force
 
 $deploymentName = 'NetworkARM'
 
-$templatePath = 'C:\GitHub\ARM-Templates\MP\VNET_1Subnet.json'
+$templatePath = 'C:\GitHub\ARM-Templates\MP\VNET_2Subnets.json'
 
 $location = 'East US'
-$resourceGroup = 'NetworkRGCompZ'
+$resourceGroup = 'NetworkRGCompA'
 
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
 
@@ -33,21 +33,21 @@ New-AzureRmResourceGroup -Name $resourceGroup -Location $location -Verbose -Forc
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
 
 $parameters = @{
-    'virtualNetworkName' = 'VNetCompZ';
-    'addressSpace' = '10.1.0.0/16';
-    'secGroup1Name' = 'SecGroupCompZFE';
-    'subnet1Name' = 'Core';
-    'subnet1AddrPrefix' = '10.1.0.0/24';
+    'virtualNetworkName' = 'VNetCompA';
+    'addressSpace' = '10.10.0.0/16';
+    'secGroup1Name' = 'SecGroupCompAFE';
+    'secGroup2Name' = 'SecGroupCompABE';
+    'subnet1Name' = 'FrontEnd';
+    'subnet1AddrPrefix' = '10.10.10.0/24';
+    'subnet2Name' = 'BackEnd';
+    'subnet2AddrPrefix' = '10.10.20.0/24';
     'dnsAddress' = '10.1.0.10';
-    'gwSubnetAddrPrefix' = '10.1.255.0/27';
-    'gatewayName' = 'VNetCompZGW';
-    'gatewayPublicIPName' = 'VNetCompZGWIP';
-    'gatewayIPConf' = 'VNetCompZGWIPConf'
+    'gwSubnetAddrPrefix' = '10.10.255.0/27';
+    'gatewayName' = 'VNetCompAGW';
+    'gatewayPublicIPName' = 'VNetCompAGWIP';
+    'gatewayIPConf' = 'VNetCompAGWIPConf'
 }
 
 New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroup -TemplateFile $templatePath -TemplateParameterObject $parameters 
 
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
-
-
-
