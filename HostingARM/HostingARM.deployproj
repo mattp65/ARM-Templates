@@ -35,6 +35,20 @@
     <Content Include="images\architecture.png" />
     <Content Include="images\resources.png" />
     <Content Include="scripts\WebServerConfig.ps1.zip" />
+    <None Include="nestedtemplates\VNETtoVNET.json" />
+    <None Include="SampleTemplates\ad-new-domainTest.ps1" />
+    <None Include="nestedtemplates\VNET_1Subnet.json" />
+    <None Include="nestedtemplates\VNET_1Subnet.parameters.json" />
+    <None Include="nestedtemplates\VNET_1SubnetTest.ps1" />
+    <None Include="nestedtemplates\VNET_1SubnetX.json" />
+    <None Include="nestedtemplates\VNET_2Subnets.json" />
+    <None Include="nestedtemplates\VNET_2SubnetsTest.ps1" />
+    <None Include="SampleTemplates\ad-ha-2dc.json" />
+    <None Include="SampleTemplates\ad-new-domain.json" />
+    <None Include="SampleTemplates\configureADBDC.json" />
+    <None Include="SampleTemplates\nic.json" />
+    <None Include="SampleTemplates\vnet-with-dns-server.json" />
+    <None Include="SampleTemplates\vnet.json" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
