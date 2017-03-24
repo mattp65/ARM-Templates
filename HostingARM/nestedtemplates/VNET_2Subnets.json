@@ -1,0 +1,268 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the VNET."
+            }
+        },
+        "addressSpace": {
+            "type": "string",
+            "metadata": {
+                "description": "Address space for the VNET."
+            }
+        },
+        "secGroup1Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the first Network Security Group."
+            }
+        },
+        "secGroup2Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the second Network Security Group."
+            }
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "FrontEnd",
+            "metadata": {
+                "description": "Name of the first subnet in the VNET. Please note, an additional subnet called GatewaySubnet will be created where the VirtualNetworkGateway will be deployed. The name of that subnet must not be changed from GatewaySubnet."
+            }
+        },
+        "subnet1AddrPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the first subnet in the VNET."
+            }
+        },
+        "subnet2Name": {
+            "type": "string",
+            "defaultValue": "FrontEnd",
+            "metadata": {
+                "description": "Name of the second subnet in the VNET."
+            }
+        },
+        "subnet2AddrPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the second subnet in the VNET."
+            }
+        },
+        "dnsAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "The DNS Server address."
+            }
+        },
+        "gwSubnetAddrPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the GatewaySubnet where the VirtualNetworkGateway will be deployed. This must be at least /29."
+            }
+        },
+        "gatewayPublicIPName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the PublicIP attached to the VirtualNetworkGateway."
+            }
+        },
+        "gatewayIPConf": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Gateway IP Config attached to the VirtualNetworkGateway."
+            }
+        },
+        "gatewayName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the VirtualNetworkGateway."
+            }
+        }
+    },
+    "variables": {
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/GatewaySubnet')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('secGroup1Name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Int_http",
+                        "properties": {
+                            "description": "This rule allows HTTP traffic in on port 80",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "INTERNET",
+                            "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "Int_https",
+                        "properties": {
+                            "description": "This rule allows HTTPS traffic in on port 443",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "INTERNET",
+                            "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "Int_rdp",
+                        "properties": {
+                            "description": "This rule allows RDP traffic on port 3389 from the web",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "INTERNET",
+                            "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('secGroup2Name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "FE_sql",
+                        "properties": {
+                            "description": "This rule allows traffic in on port 1433",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "1433",
+                            "sourceAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "destinationAddressPrefix": "[parameters('subnet2AddrPrefix')]",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "FE_Block",
+                        "properties": {
+                            "description": "This rule blocks all remainging traffic from the FE",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "destinationAddressPrefix": "[parameters('subnet2AddrPrefix')]",
+                            "access": "Deny",
+                            "priority": 500,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-15",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('secGroup1Name'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('secGroup2Name'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressSpace')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "[parameters('dnsAddress')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('secGroup1Name'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet2AddrPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('secGroup2Name'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('gwSubnetAddrPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('gatewayPublicIPName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[parameters('gatewayName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('gatewayPublicIPName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('gatewaySubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('gatewayPublicIPName'))]"
+                            }
+                        },
+                        "name": "[parameters('gatewayIPConf')]"
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": "false"
+            }
+        }
+    ]
+}

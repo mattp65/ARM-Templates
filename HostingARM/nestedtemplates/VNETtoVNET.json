@@ -1,0 +1,90 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sharedKey": {
+            "type": "string",
+            "metadata": {
+                "description": "SharedKey value for VNAT connection."
+            }
+        },
+        "location1": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of first VNET."
+            }
+        },
+        "gateway1Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Gateway for the first VNET."
+            }
+        },
+        "conn1Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the first Connection."
+            }
+        },
+        "location2": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of second VNET."
+            }
+        },
+        "gateway2Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Gateway for the second VNET."
+            }
+        },
+        "conn2Name": {
+            "type": "string",
+            "metadata": {
+                "description": "Name for the second Connection."
+            }
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/connections",
+            "name": "[parameters('conn1Name')]",
+            "location": "[parameters('location1')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gateway1Name'))]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gateway2Name'))]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]"
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/connections",
+            "name": "[parameters('conn2Name')]",
+            "location": "[parameters('location2')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gateway2Name'))]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gateway1Name'))]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]"
+            }
+        }
+    ]
+}
