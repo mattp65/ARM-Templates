@@ -43,7 +43,7 @@
       "metadata": {
         "description": "The location of resources, such as templates and DSC modules, that the template depends on"
       },
-      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain"
+      "defaultValue": "https://raw.githubusercontent.com/mattp65/ARM-Templates/master/HostingARM"
     }
   },
   "variables": {
@@ -103,7 +103,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/vnet.json')]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/SampleTemplates/vnet.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -299,7 +299,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/vnet-with-dns-server.json')]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/SampleTemplates/vnet-with-dns-server.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
