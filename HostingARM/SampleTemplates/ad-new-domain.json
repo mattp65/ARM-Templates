@@ -62,7 +62,7 @@
     "adAvailabilitySetName": "adAvailabiltySet",
     "adLBName": "adLoadBalancer",
     "adPDCModulesURLxx": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain-ha-2-dc/DSC/CreateADPDC.ps1.zip",
-    "adPDCModulesURL": "[concat(parameters('_artifactsLocation'), '/DSC/CreateADPDC.zip')]",
+    "adPDCModulesURL": "[concat(parameters('_artifactsLocation'), '/DSC/CreateADPDC2.ps1.zip')]",
     "adPDCConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC"
   },
   "resources": [
