@@ -20,7 +20,7 @@ $adminPassword = ConvertTo-SecureString 'Caviar!60062' -AsPlainText -Force
 
 $deploymentName = 'NetworkARM'
 
-$templatePath = 'C:\GitHub\ARM-Templates\MP\VNETtoVNET.json'
+$templatePath = 'C:\GitHub\ARM-Templates\HostingARM\nestedtemplates\VNETtoVNET.json'
 
 $location = 'East US'
 $resourceGroup = 'NetworkRGCompA'
@@ -28,7 +28,9 @@ $resourceGroup = 'NetworkRGCompA'
 get-date -Format 'yyyy-MM-dd hh:mm:ss'
 
 $parameters = @{
-    'Shared Key' = 'DXCDynamics!2017';
+    'sharedkey' = 'DXCDynamics2017';
+    'rg1Name' = 'NetworkRGCompZ';
+    'rg2Name' = 'NetworkRGCompA';
     'location1' = 'East US';
     'location2' = 'East US';
     'gateway1Name' = 'VNetCompZGW';

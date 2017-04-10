@@ -43,10 +43,7 @@
   "variables": {
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "secGroup1Name": "[concat(parameters('virtualNetworkName'),'-',parameters('subnet1Name'),'-nsg')]",
-    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/GatewaySubnet')]",
-    "gatewayName": "[concat(parameters('virtualNetworkName'),'-gw')]",
-    "gatewayPublicIPName": "[concat(variables('gatewayName'),'-ip')]",
-    "gatewayIPConf": "[concat(variables('gatewayName'),'-ipconf')]"
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/GatewaySubnet')]"
   },
   "resources": [
     {
@@ -91,7 +88,7 @@
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3389",
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "INTERNET",
               "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
               "access": "Allow",
               "priority": 200,
@@ -137,44 +134,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('gatewayPublicIPName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/virtualNetworkGateways",
-      "name": "[variables('gatewayName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('gatewaySubnetRef')]"
-              },
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPublicIPName'))]"
-              }
-            },
-            "name": "[variables('gatewayIPConf')]"
-          }
-        ],
-        "gatewayType": "Vpn",
-        "vpnType": "RouteBased",
-        "enableBgp": "false"
       }
     }
   ]

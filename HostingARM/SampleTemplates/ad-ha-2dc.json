@@ -19,7 +19,7 @@
       "metadata": {
         "description": "The type of the Storage Account created"
       },
-      "defaultValue": "Premium_LRS"
+      "defaultValue": "Standard_LRS"
     },
     "virtualNetworkName": {
       "type": "string",
@@ -125,6 +125,8 @@
     "adVMSize": {
       "type": "string",
       "allowedValues": [
+        "Standard_A2",
+        "Standard_A3",
         "Standard_D1",
         "Standard_DS1",
         "Standard_D2",
@@ -161,7 +163,7 @@
       "metadata": {
         "description": "The size of the VM Created"
       },
-      "defaultValue": "Standard_DS2_v2"
+      "defaultValue": "Standard_A2"
     },
     "imagePublisher": {
       "type": "string",

@@ -162,9 +162,23 @@
                         }
                     },
                     {
+                        "name": "FE_rdp",
+                        "properties": {
+                            "description": "This rule allows RDP traffic on port 3389 from the FE",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "[parameters('subnet1AddrPrefix')]",
+                            "destinationAddressPrefix": "[parameters('subnet2AddrPrefix')]",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
                         "name": "FE_Block",
                         "properties": {
-                            "description": "This rule blocks all remainging traffic from the FE",
+                            "description": "This rule blocks all remaining traffic from the FE",
                             "protocol": "*",
                             "sourcePortRange": "*",
                             "destinationPortRange": "*",

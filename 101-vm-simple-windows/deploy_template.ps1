@@ -4,7 +4,7 @@ $TenantId = '88b84882-dd0c-4637-8524-eaa033ca7305'
 
 $user = "scripts@parks65.com"
 $pw = ConvertTo-SecureString "Caviar!65" -AsPlainText -Force
-$Cred = New-Object –TypeName System.Management.Automation.PSCredential –ArgumentList $user, $pw
+$Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pw
 
 Write-Output 'Connecting to Azure credential'
 $Account = Add-AzureRmAccount -Credential $Cred
@@ -18,15 +18,15 @@ $subout = Get-AzureRmSubscription -SubscriptionName $SubscriptionName -TenantId 
 
 
 
-$LocName = “South Central US”
+$LocName = "South Central US"
 
-$deploymentName = “ArmTest”
+$deploymentName = "ArmTest"
 
-$templatePath = “C:\GitHub\ARM-Templates\101-vm-simple-windows\azuredeploy.json”
+$templatePath = "C:\GitHub\ARM-Templates\101-vm-simple-windows\azuredeploy.json"
 
 
-$newStorageAccountName = “armtestStorageACC"
-$adminUsername = ”parks65”
+$newStorageAccountName = "armtestStorageACC"
+$adminUsername = "�parks65"
 $adminPassword = ConvertTo-SecureString "Caviar!60062" -AsPlainText -Force
 
 get-date
