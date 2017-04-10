@@ -48,9 +48,11 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('secGroupName')]",
-      "apiVersion": "2015-06-15",
+      "name": "CreateNSG",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -76,7 +78,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('secGroupName'))]"
+        "Microsoft.Resources/deployments/CreateNSG"
       ],
       "properties": {
         "addressSpace": {

@@ -24,7 +24,6 @@
     },
     "storageAccountType": {
       "value": "Standard_LRS"
-
     },
     "virtualNetworkName": {
       "value": "adVNET"

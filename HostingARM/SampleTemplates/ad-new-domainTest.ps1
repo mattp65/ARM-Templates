@@ -1,43 +1,80 @@
-$SubscriptionName = 'aVisual Studio Ultimate with MSDN'
-$TenantId = '88b84882-dd0c-4637-8524-eaa033ca7305'
 
-$user = 'scripts@parks65.com'
-$pw = ConvertTo-SecureString 'Caviar!65' -AsPlainText -Force
-$Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pw
 
-Write-Output 'Connecting to Azure credential'
-$Account = Add-AzureRmAccount -Credential $Cred
-if (!$Account) {
-    # Throw 'Could not authenticate using the credential asset '${CredentialAssetName}'. Make sure the user name and password are correct.'
-    Throw 'Could not authenticate using entered credentials. Make sure the user name and password are correct.'
+function create-DCJOB {
+    [cmdletbinding()]
+    Param($resourceGroup, $dnsName)
+
+    $scriptBlock = {
+        param($resourceGroup, $dnsName)
+        
+        Write-Output "Create - $resourceGroup"
+
+        $templatePath      = 'C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\ad-new-domain.json'
+        $parameterFilePath = "C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\ad-new-domain.parameters.json"
+        $deploymentName = 'DomainARM'
+        $location = 'South Central US'
+
+        $tmpFilePath = $parameterFilePath + "$resourceGroup.json"
+
+        # Override the configurable job parms for just thie job
+        $jobParms = Get-Content $parameterFilePath | Out-String | ConvertFrom-Json
+
+        $jobParms.parameters.dnsPrefix.value = $dnsName
+
+        ConvertTo-Json -InputObject $jobParms -Depth 30 -Compress | Out-File $tmpFilePath -Encoding utf8
+
+        $SubscriptionName = 'aVisual Studio Ultimate with MSDN'
+        $TenantId = '88b84882-dd0c-4637-8524-eaa033ca7305'
+
+        $user = "scripts@parks65.com"
+        $pw = ConvertTo-SecureString "Caviar!65" -AsPlainText -Force
+        $Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pw
+
+        $Account = Add-AzureRmAccount -Credential $Cred
+        $subout = Get-AzureRmSubscription -SubscriptionName $SubscriptionName -TenantId $TenantId  | Select-AzureRmSubscription
+
+        get-date -Format 'yyyy-MM-dd hh:mm:ss'
+
+        New-AzureRmResourceGroup -Name $resourceGroup -Location $location -Verbose -Force
+
+        get-date -Format 'yyyy-MM-dd hh:mm:ss'
+
+        New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroup -TemplateFile $templatePath -TemplateParameterFile $tmpFilePath 
+
+        get-date -Format 'yyyy-MM-dd hh:mm:ss'
+        
+        #Remove-Item -Path $tmpFilePath
+    }
+
+    Start-Job –Name "C$resourceGroup" –Scriptblock $scriptBlock -ArgumentList $resourceGroup, $dnsName
 }
 
-Write-Output 'Setting the Subscription'
-$subout = Get-AzureRmSubscription -SubscriptionName $SubscriptionName -TenantId $TenantId  | Select-AzureRmSubscription
 
-$adminUsername = 'parks65'
-$adminPassword = ConvertTo-SecureString 'Caviar!60062' -AsPlainText -Force
+$Suffix  ="t"
+$dnsName ='parks65dc' + $Suffix
 
-$deploymentName = 'NetworkARM'
+$resourceGroup = 'dcTest' + $Suffix
+create-DCJOB $resourceGroup $dnsName
 
-$templatePath = 'C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\ad-new-domain.json'
+$jobs = get-job
 
-$location = 'West US'
-$resourceGroup = 'adTest'
+#$jobs | Wait-Job
 
-get-date -Format 'yyyy-MM-dd hh:mm:ss'
+#foreach ($job in get-job) {receive-job $job}
 
+#get-job | Remove-Job
+#get-job | Remove-Job
 
-get-date -Format 'yyyy-MM-dd hh:mm:ss'
-
-$parameters = @{
-    'adminUsername' = $adminUsername;
-    'adminPassword' = $adminPassword;
-    'domainName' = 'parks65.local';
-    'dnsPrefix' = 'paarks65ad';
-    'windowsserver' = '2012-R2-Datacenter'
+$jobs = get-job | Where { $_.State -eq "Running" }
+While ($jobs.Count -ne 0) {
+    Write-Host "$(get-date -Format 'hh:mm:ss') Waiting for $($jobs.Count) background jobs..."
+    Start-Sleep -Seconds 30
+    $jobs = get-job | Where { $_.State -eq "Running" }
 }
 
-New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroup -TemplateFile $templatePath -TemplateParameterObject $parameters 
+foreach ($job in get-job) {
+    write-host $job.Name 
+    receive-job $job
+    write-host $job.Name 
+}
 
-get-date -Format 'yyyy-MM-dd hh:mm:ss'

@@ -13,6 +13,13 @@
       "metadata": {
         "description": "The prefix for the subnet."
       }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of resources, such as templates and DSC modules, that the template depends on"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/mattp65/ARM-Templates/master/HostingARM"
     }
   },
   "variables": {

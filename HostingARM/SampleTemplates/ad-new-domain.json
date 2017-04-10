@@ -26,12 +26,12 @@
         "description": "The DNS prefix for the public IP address used by the Load Balancer"
       }
     },
-    "windowsserver":{
+    "windowsserver": {
       "type": "string",
-       "metadata": {
+      "metadata": {
         "description": "The version of Windows Server to use"
       },
-      "defaultValue": "2016-Datacenter",
+      "defaultValue": "2012-R2-Datacenter",
       "allowedValues": [
         "2012-Datacenter",
         "2012-R2-Datacenter",
@@ -49,7 +49,7 @@
   "variables": {
     "virtualNetworkName": "adVNET",
     "virtualNetworkAddressRange": "10.0.0.0/16",
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'adsa')]",
+    "storageAccountName": "[take(concat(toLower(parameters('dnsPrefix')), 'st',uniquestring(resourceGroup().id)),24)]",
     "adLBFE": "LBFE",
     "adLBBE": "LBBE",
     "adRDPNAT": "adRDP",
@@ -61,6 +61,7 @@
     "publicIPAddressName": "adPublicIP",
     "adAvailabilitySetName": "adAvailabiltySet",
     "adLBName": "adLoadBalancer",
+    "vnetTemplateURI": "[concat(parameters('_artifactsLocation'), '/SampleTemplates/vnet.json')]",
     "adPDCModulesURLxx": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/active-directory-new-domain-ha-2-dc/DSC/CreateADPDC.ps1.zip",
     "adPDCModulesURL": "[concat(parameters('_artifactsLocation'),  '/DSC/CreateADPDC2.ps1.zip')]",
     "adPDCModulesURL9": "[concat(parameters('_artifactsLocation'),   '/DSC/CreateADPDC.ps1.zip')]",
@@ -105,7 +106,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/SampleTemplates/vnet.json')]",
+          "uri": "[variables('vnetTemplateURI')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -273,7 +274,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "ModulesUrl": "[variables('adPDCModulesURL')]",
-              "ConfigurationFunction": "CreateADPDC.ps1\\CreateADPDC",
+              "ConfigurationFunction": "CreateADPDC2.ps1\\CreateADPDC",
               "Properties": {
                 "DomainName": "[parameters('domainName')]",
                 "AdminCreds": {
