@@ -13,6 +13,12 @@
       "metadata": {
         "description": "The prefix for the subnet."
       }
+    },
+    "beAddrPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The prefix for the BackEnd subnet."
+      }
     }
   },
   "variables": {
@@ -65,6 +71,34 @@
               "access": "Allow",
               "priority": 200,
               "direction": "Inbound"
+            }
+          },
+          {
+            "name": "BE_sql",
+            "properties": {
+              "description": "BE_sql",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "[parameters('subnetAddrPrefix')]",
+              "destinationAddressPrefix": "[parameters('beAddrPrefix')]",
+              "access": "Allow",
+              "priority": 120,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "BE_rdp",
+            "properties": {
+              "description": "BE_rdp",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3889",
+              "sourceAddressPrefix": "[parameters('subnetAddrPrefix')]",
+              "destinationAddressPrefix": "[parameters('beAddrPrefix')]",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Outbound"
             }
           },
           {
