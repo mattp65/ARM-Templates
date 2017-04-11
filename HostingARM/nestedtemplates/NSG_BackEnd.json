@@ -14,10 +14,10 @@
         "description": "The prefix for the subnet."
       }
     },
-    "beAddrPrefix": {
+    "feAddrPrefix": {
       "type": "string",
       "metadata": {
-        "description": "The prefix for the BackEnd subnet."
+        "description": "The prefix for the FrontEnd subnet."
       }
     },
     "_artifactsLocation": {
@@ -39,45 +39,647 @@
       "properties": {
         "securityRules": [
           {
-            "name": "INT_http",
+            "name": "FE_sql",
             "properties": {
-              "description": "INT_http",
+              "description": "FE_sql",
               "protocol": "Tcp",
               "sourcePortRange": "*",
-              "destinationPortRange": "80",
-              "sourceAddressPrefix": "Internet",
+              "destinationPortRange": "1433",
+              "sourceAddressPrefix": "[parameters('feAddrPrefix')]",
               "destinationAddressPrefix": "[parameters('subnetAddrPrefix')]",
               "access": "Allow",
-              "priority": 100,
+              "priority": 120,
               "direction": "Inbound"
             }
           },
           {
-            "name": "INT_https",
+            "name": "FE_Deny",
             "properties": {
-              "description": "INT_https",
-              "protocol": "Tcp",
+              "description": "FE_Deny",
+              "protocol": "*",
               "sourcePortRange": "*",
-              "destinationPortRange": "433",
-              "sourceAddressPrefix": "Internet",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "[parameters('feAddrPrefix')]",
               "destinationAddressPrefix": "[parameters('subnetAddrPrefix')]",
-              "access": "Allow",
-              "priority": 110,
+              "access": "Deny",
+              "priority": 4010,
               "direction": "Inbound"
             }
           },
           {
-            "name": "INT_rdp",
+            "name": "AD_smtp_In",
             "properties": {
-              "description": "INT_rdp",
+              "description": "AD_smtp_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "25",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_wins_In",
+            "properties": {
+              "description": "AD_wins_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "42",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1201,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_dns_In",
+            "properties": {
+              "description": "AD_dns_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "53",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1202,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_dhcp1_In",
+            "properties": {
+              "description": "AD_dhcp1_In",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "67",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1203,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_kerberos_In",
+            "properties": {
+              "description": "AD_kerberos_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1204,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_windowstime_In",
+            "properties": {
+              "description": "AD_windowstime_In",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "123",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1205,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_rpcepm_In",
+            "properties": {
+              "description": "AD_rpcepm_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "135",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1206,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_netbiosname_In",
+            "properties": {
+              "description": "AD_netbiosname_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "137",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1207,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_netbioddata_In",
+            "properties": {
+              "description": "AD_netbioddata_In",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "138",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1208,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_netbiodsession_In",
+            "properties": {
+              "description": "AD_netbiodsession_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "139",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1209,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_ldap_In",
+            "properties": {
+              "description": "AD_ldap_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1210,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_replication_In",
+            "properties": {
+              "description": "AD_replication_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "445",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1211,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_passwordchange_In",
+            "properties": {
+              "description": "AD_passwordchange_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "464",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1212,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_ldapssl_In",
+            "properties": {
+              "description": "AD_ldapssl_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "636",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1213,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_dhcp2_In",
+            "properties": {
+              "description": "AD_dhcp2_In",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "2535",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1214,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_ldapgc_In",
+            "properties": {
+              "description": "AD_ldapgc_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3268",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1215,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_ldapgcssl_In",
+            "properties": {
+              "description": "AD_ldapgcssl_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3269",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1216,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_dfsr_In",
+            "properties": {
+              "description": "AD_dfsr_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "5722",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1217,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_soap_In",
+            "properties": {
+              "description": "AD_soap_In",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "9389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1218,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_dynamic_In",
+            "properties": {
+              "description": "AD_dynamic_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "49152-65535",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1219,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "VNET_rdp_In",
+            "properties": {
+              "description": "VNET_rdp_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3889",
-              "sourceAddressPrefix": "Internet",
-              "destinationAddressPrefix": "[parameters('subnetAddrPrefix')]",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
               "access": "Allow",
-              "priority": 200,
+              "priority": 3900,
               "direction": "Inbound"
+            }
+          },
+          {
+            "name": "VNET_Deny_In",
+            "properties": {
+              "description": "VNET_Deny_In",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AD_smtp_Out",
+            "properties": {
+              "description": "AD_smtp_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "25",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_wins_Out",
+            "properties": {
+              "description": "AD_wins_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "42",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1201,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_dns_Out",
+            "properties": {
+              "description": "AD_dns_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "53",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1202,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_dhcp1_Out",
+            "properties": {
+              "description": "AD_dhcp1_Out",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "67",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1203,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_kerberos_Out",
+            "properties": {
+              "description": "AD_kerberos_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "88",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1204,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_windowstime_Out",
+            "properties": {
+              "description": "AD_windowstime_Out",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "123",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1205,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_rpcepm_Out",
+            "properties": {
+              "description": "AD_rpcepm_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "135",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1206,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_netbiosname_Out",
+            "properties": {
+              "description": "AD_netbiosname_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "137",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1207,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_netbioddata_Out",
+            "properties": {
+              "description": "AD_netbioddata_Out",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "138",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1208,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_netbiodsession_Out",
+            "properties": {
+              "description": "AD_netbiodsession_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "139",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1209,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_ldap_Out",
+            "properties": {
+              "description": "AD_ldap_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1210,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_replication_Out",
+            "properties": {
+              "description": "AD_replication_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "445",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1211,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_passwordchange_Out",
+            "properties": {
+              "description": "AD_passwordchange_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "464",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1212,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_ldapssl_Out",
+            "properties": {
+              "description": "AD_ldapssl_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "636",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1213,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_dhcp2_Out",
+            "properties": {
+              "description": "AD_dhcp2_Out",
+              "protocol": "Udp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "2535",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1214,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_ldapgc_Out",
+            "properties": {
+              "description": "AD_ldapgc_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3268",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1215,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_ldapgcssl_Out",
+            "properties": {
+              "description": "AD_ldapgcssl_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3269",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1216,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_dfsr_Out",
+            "properties": {
+              "description": "AD_dfsr_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "5722",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1217,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_soap_Out",
+            "properties": {
+              "description": "AD_soap_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "9389",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1218,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "AD_dynamic_Out",
+            "properties": {
+              "description": "AD_dynamic_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "49152-65535",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 1219,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "VNET_rdp_Out",
+            "properties": {
+              "description": "VNET_rdp_Out",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3889",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Allow",
+              "priority": 3900,
+              "direction": "Outbound"
+            }
+          },
+          {
+            "name": "VNET_Deny_Out",
+            "properties": {
+              "description": "VNET_Deny_Out",
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "access": "Deny",
+              "priority": 4000,
+              "direction": "Outbound"
             }
           }
         ]
