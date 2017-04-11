@@ -74,10 +74,12 @@
               "direction": "Inbound"
             }
           },
+
+
           {
-            "name": "AD_smtp",
+            "name": "AD_smtp_In",
             "properties": {
-              "description": "AD_smtp",
+              "description": "AD_smtp_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "25",
@@ -89,9 +91,9 @@
             }
           },
           {
-            "name": "AD_wins",
+            "name": "AD_wins_In",
             "properties": {
-              "description": "AD_wins",
+              "description": "AD_wins_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "42",
@@ -103,9 +105,9 @@
             }
           },
           {
-            "name": "AD_dns",
+            "name": "AD_dns_In",
             "properties": {
-              "description": "AD_dns",
+              "description": "AD_dns_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "53",
@@ -117,9 +119,9 @@
             }
           },
           {
-            "name": "AD_dhcp1",
+            "name": "AD_dhcp1_In",
             "properties": {
-              "description": "AD_dhcp1",
+              "description": "AD_dhcp1_In",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "67",
@@ -131,9 +133,9 @@
             }
           },
           {
-            "name": "AD_kerberos",
+            "name": "AD_kerberos_In",
             "properties": {
-              "description": "AD_kerberos",
+              "description": "AD_kerberos_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "88",
@@ -145,9 +147,9 @@
             }
           },
           {
-            "name": "AD_windowstime",
+            "name": "AD_windowstime_In",
             "properties": {
-              "description": "AD_windowstime",
+              "description": "AD_windowstime_In",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "123",
@@ -159,9 +161,9 @@
             }
           },
           {
-            "name": "AD_rpcepm",
+            "name": "AD_rpcepm_In",
             "properties": {
-              "description": "AD_rpcepm",
+              "description": "AD_rpcepm_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "135",
@@ -173,9 +175,9 @@
             }
           },
           {
-            "name": "AD_netbiosname",
+            "name": "AD_netbiosname_In",
             "properties": {
-              "description": "AD_netbiosname",
+              "description": "AD_netbiosname_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "137",
@@ -187,9 +189,9 @@
             }
           },
           {
-            "name": "AD_netbioddata",
+            "name": "AD_netbioddata_In",
             "properties": {
-              "description": "AD_netbioddata",
+              "description": "AD_netbioddata_In",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "138",
@@ -201,9 +203,9 @@
             }
           },
           {
-            "name": "AD_netbiodsession",
+            "name": "AD_netbiodsession_In",
             "properties": {
-              "description": "AD_netbiodsession",
+              "description": "AD_netbiodsession_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "139",
@@ -215,9 +217,9 @@
             }
           },
           {
-            "name": "AD_ldap",
+            "name": "AD_ldap_In",
             "properties": {
-              "description": "AD_ldap",
+              "description": "AD_ldap_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "389",
@@ -229,9 +231,9 @@
             }
           },
           {
-            "name": "AD_replication",
+            "name": "AD_replication_In",
             "properties": {
-              "description": "AD_replication",
+              "description": "AD_replication_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "445",
@@ -243,9 +245,9 @@
             }
           },
           {
-            "name": "AD_passwordchange",
+            "name": "AD_passwordchange_In",
             "properties": {
-              "description": "AD_passwordchange",
+              "description": "AD_passwordchange_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "464",
@@ -257,9 +259,9 @@
             }
           },
           {
-            "name": "AD_ldapssl",
+            "name": "AD_ldapssl_In",
             "properties": {
-              "description": "AD_ldapssl",
+              "description": "AD_ldapssl_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "636",
@@ -271,9 +273,9 @@
             }
           },
           {
-            "name": "AD_dhcp2",
+            "name": "AD_dhcp2_In",
             "properties": {
-              "description": "AD_dhcp2",
+              "description": "AD_dhcp2_In",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "2535",
@@ -285,9 +287,9 @@
             }
           },
           {
-            "name": "AD_ldapgc",
+            "name": "AD_ldapgc_In",
             "properties": {
-              "description": "AD_ldapgc",
+              "description": "AD_ldapgc_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3268",
@@ -299,9 +301,9 @@
             }
           },
           {
-            "name": "AD_ldapgcssl",
+            "name": "AD_ldapgcssl_In",
             "properties": {
-              "description": "AD_ldapgcssl",
+              "description": "AD_ldapgcssl_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3269",
@@ -313,9 +315,9 @@
             }
           },
           {
-            "name": "AD_dfsr",
+            "name": "AD_dfsr_In",
             "properties": {
-              "description": "AD_dfsr",
+              "description": "AD_dfsr_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "5722",
@@ -327,9 +329,9 @@
             }
           },
           {
-            "name": "AD_soap",
+            "name": "AD_soap_In",
             "properties": {
-              "description": "AD_soap",
+              "description": "AD_soap_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "9389",
@@ -341,9 +343,9 @@
             }
           },
           {
-            "name": "AD_dynamic",
+            "name": "AD_dynamic_In",
             "properties": {
-              "description": "AD_dynamic",
+              "description": "AD_dynamic_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "49152-65535",
@@ -355,9 +357,9 @@
             }
           },
           {
-            "name": "VNET_rdp",
+            "name": "VNET_rdp_In",
             "properties": {
-              "description": "VNET_rdp",
+              "description": "VNET_rdp_In",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3889",
@@ -369,9 +371,9 @@
             }
           },
           {
-            "name": "VNET_Deny",
+            "name": "VNET_Deny_In",
             "properties": {
-              "description": "VNET_Deny",
+              "description": "VNET_Deny_In",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "*",
@@ -383,9 +385,9 @@
             }
           },
           {
-            "name": "AD_smtp",
+            "name": "AD_smtp_Out",
             "properties": {
-              "description": "AD_smtp",
+              "description": "AD_smtp_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "25",
@@ -397,9 +399,9 @@
             }
           },
           {
-            "name": "AD_wins",
+            "name": "AD_wins_Out",
             "properties": {
-              "description": "AD_wins",
+              "description": "AD_wins_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "42",
@@ -411,9 +413,9 @@
             }
           },
           {
-            "name": "AD_dns",
+            "name": "AD_dns_Out",
             "properties": {
-              "description": "AD_dns",
+              "description": "AD_dns_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "53",
@@ -425,9 +427,9 @@
             }
           },
           {
-            "name": "AD_dhcp1",
+            "name": "AD_dhcp1_Out",
             "properties": {
-              "description": "AD_dhcp1",
+              "description": "AD_dhcp1_Out",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "67",
@@ -439,9 +441,9 @@
             }
           },
           {
-            "name": "AD_kerberos",
+            "name": "AD_kerberos_Out",
             "properties": {
-              "description": "AD_kerberos",
+              "description": "AD_kerberos_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "88",
@@ -453,9 +455,9 @@
             }
           },
           {
-            "name": "AD_windowstime",
+            "name": "AD_windowstime_Out",
             "properties": {
-              "description": "AD_windowstime",
+              "description": "AD_windowstime_Out",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "123",
@@ -467,9 +469,9 @@
             }
           },
           {
-            "name": "AD_rpcepm",
+            "name": "AD_rpcepm_Out",
             "properties": {
-              "description": "AD_rpcepm",
+              "description": "AD_rpcepm_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "135",
@@ -481,9 +483,9 @@
             }
           },
           {
-            "name": "AD_netbiosname",
+            "name": "AD_netbiosname_Out",
             "properties": {
-              "description": "AD_netbiosname",
+              "description": "AD_netbiosname_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "137",
@@ -495,9 +497,9 @@
             }
           },
           {
-            "name": "AD_netbioddata",
+            "name": "AD_netbioddata_Out",
             "properties": {
-              "description": "AD_netbioddata",
+              "description": "AD_netbioddata_Out",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "138",
@@ -509,9 +511,9 @@
             }
           },
           {
-            "name": "AD_netbiodsession",
+            "name": "AD_netbiodsession_Out",
             "properties": {
-              "description": "AD_netbiodsession",
+              "description": "AD_netbiodsession_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "139",
@@ -523,9 +525,9 @@
             }
           },
           {
-            "name": "AD_ldap",
+            "name": "AD_ldap_Out",
             "properties": {
-              "description": "AD_ldap",
+              "description": "AD_ldap_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "389",
@@ -537,9 +539,9 @@
             }
           },
           {
-            "name": "AD_replication",
+            "name": "AD_replication_Out",
             "properties": {
-              "description": "AD_replication",
+              "description": "AD_replication_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "445",
@@ -551,9 +553,9 @@
             }
           },
           {
-            "name": "AD_passwordchange",
+            "name": "AD_passwordchange_Out",
             "properties": {
-              "description": "AD_passwordchange",
+              "description": "AD_passwordchange_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "464",
@@ -565,9 +567,9 @@
             }
           },
           {
-            "name": "AD_ldapssl",
+            "name": "AD_ldapssl_Out",
             "properties": {
-              "description": "AD_ldapssl",
+              "description": "AD_ldapssl_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "636",
@@ -579,9 +581,9 @@
             }
           },
           {
-            "name": "AD_dhcp2",
+            "name": "AD_dhcp2_Out",
             "properties": {
-              "description": "AD_dhcp2",
+              "description": "AD_dhcp2_Out",
               "protocol": "Udp",
               "sourcePortRange": "*",
               "destinationPortRange": "2535",
@@ -593,9 +595,9 @@
             }
           },
           {
-            "name": "AD_ldapgc",
+            "name": "AD_ldapgc_Out",
             "properties": {
-              "description": "AD_ldapgc",
+              "description": "AD_ldapgc_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3268",
@@ -607,9 +609,9 @@
             }
           },
           {
-            "name": "AD_ldapgcssl",
+            "name": "AD_ldapgcssl_Out",
             "properties": {
-              "description": "AD_ldapgcssl",
+              "description": "AD_ldapgcssl_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3269",
@@ -621,9 +623,9 @@
             }
           },
           {
-            "name": "AD_dfsr",
+            "name": "AD_dfsr_Out",
             "properties": {
-              "description": "AD_dfsr",
+              "description": "AD_dfsr_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "5722",
@@ -635,9 +637,9 @@
             }
           },
           {
-            "name": "AD_soap",
+            "name": "AD_soap_Out",
             "properties": {
-              "description": "AD_soap",
+              "description": "AD_soap_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "9389",
@@ -649,9 +651,9 @@
             }
           },
           {
-            "name": "AD_dynamic",
+            "name": "AD_dynamic_Out",
             "properties": {
-              "description": "AD_dynamic",
+              "description": "AD_dynamic_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "49152-65535",
@@ -663,9 +665,9 @@
             }
           },
           {
-            "name": "VNET_rdp",
+            "name": "VNET_rdp_Out",
             "properties": {
-              "description": "VNET_rdp",
+              "description": "VNET_rdp_Out",
               "protocol": "Tcp",
               "sourcePortRange": "*",
               "destinationPortRange": "3889",
@@ -677,9 +679,9 @@
             }
           },
           {
-            "name": "VNET_Deny",
+            "name": "VNET_Deny_Out",
             "properties": {
-              "description": "VNET_Deny",
+              "description": "VNET_Deny_Out",
               "protocol": "*",
               "sourcePortRange": "*",
               "destinationPortRange": "*",
