@@ -70,11 +70,11 @@
     },
     "nicname": {
       "type": "string",
-      "value": "[reference(concat('Microsoft.Network/networkInterfaces/', variables('nicName'))).name]"
+      "value": "[variables('nicName')]"
     },
     "nicid": {
       "type": "string",
-      "value": "[reference(concat('Microsoft.Network/networkInterfaces/', variables('nicName'))).id]"
+      "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
     }
   }
 }
