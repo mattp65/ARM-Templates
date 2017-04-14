@@ -71,10 +71,6 @@
     "nicname": {
       "type": "string",
       "value": "[variables('nicName')]"
-    },
-    "nicid": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
     }
   }
 }

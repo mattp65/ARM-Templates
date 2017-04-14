@@ -1,0 +1,239 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the Virtual Machine."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for the Virtual Machine."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Virtual Machine."
+      }
+    },
+    "vlanRGName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource Group of the VLAN to use."
+      }
+    },
+    "vlanName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the VLAN to use."
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the SubNet to use."
+      }
+    },
+    "nicType": {
+      "type": "string",
+      "defaultValue": "DynamicNoPIP",
+      "allowedValues": [
+        "DynamicNoPIP",
+        "DynamicPIP",
+        "StaticNoPIP",
+        "StaticPIP"
+      ],
+      "metadata": {
+        "description": "Used to select the NIC sub-template to use"
+      }
+    },
+    "dnsName": {
+      "type": "string",
+      "defaultValue": "n/a",
+      "metadata": {
+        "description": "Optional: Unique DNS Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "ipAddress": {
+      "type": "string",
+      "defaultValue": "n/a",
+      "metadata": {
+        "description": "Optionsal: Static internal IP for the Virtual Machine."
+      }
+    },
+    "adVMSize": {
+      "type": "string",
+      "defaultValue": "Standard_A2",
+      "allowedValues": [
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2"
+      ],
+      "metadata": {
+        "description": "The size of the VM Created"
+      }
+    },
+    "windowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2016-Datacenter",
+      "allowedValues": [
+        "2012-R2-Datacenter",
+        "2016-Datacenter"
+      ],
+      "metadata": {
+        "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+      }
+    },
+    "dataDiskSize": {
+      "type": "int",
+      "defaultValue": 25,
+      "metadata": {
+        "description": "Size (GB) for the Data disk."
+      }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of resources, such as templates and DSC modules, that the template depends on"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/mattp65/ARM-Templates/master/HostingARM"
+    }
+  },
+  "variables": {
+    "vmStorAcctName": "[take(concat(toLower(parameters('vmName')), 'st',uniquestring(resourceGroup().id)),24)]",
+    "diagStorAcctName": "[take(concat(toLower(resourceGroup().name), 'stdiag'),24)]",
+    "subnetID": "[resourceId(parameters('vlanRGName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vlanName'), parameters('subnetName'))]",
+    "nicTemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NIC_', parameters('nicType'), '.json')]"
+  },
+  "resources": [
+    {
+      "name": "[variables('vmStorAcctName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "[variables('diagStorAcctName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "[concat('CreateNIC-',parameters('vmName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nicTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "subnetID": {
+            "value": "[variables('subnetID')]"
+          },
+          "dnsName": {
+            "value": "[parameters('dnsName')]"
+          },
+          "ipAddress": {
+            "value": "[parameters('ipAddress')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[parameters('vmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/', variables('vmStorAcctName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagStorAcctName'))]",
+        "[concat('Microsoft.Resources/deployments/CreateNIC-',parameters('vmName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('adVMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('windowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('vmName'),'-os')]",
+            "createOption": "FromImage",
+            "vhd": {
+              "uri": "[concat('https', '://', variables('vmStorAcctName'), '.blob.core.windows.net', concat('/vhds/', toLower(parameters('vmName')),'-os.vhd'))]"
+            }
+          },
+          "dataDisks": [
+            {
+              "name": "[concat(parameters('vmName'),'-data1')]",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
+              "lun": 0,
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat('https', '://', variables('vmStorAcctName'), '.blob.core.windows.net', concat('/vhds/', toLower(parameters('vmName')),'-data1.vhd'))]"
+              }
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',reference(concat('CreateNIC-',parameters('vmName'))).outputs.nicName.value)]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('diagStorAcctName'))).primaryEndpoints.blob]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "hostname": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))).osProfile.computerName]"
+    }
+  }
+}
