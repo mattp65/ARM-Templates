@@ -46,6 +46,12 @@
         "description": "The DNS Server address."
       }
     },
+    "gwSubnetAddrPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The prefix for the GatewaySubnet where the VirtualNetworkGateway will be deployed. This must be at least /29."
+      }
+    },
     "_artifactsLocation": {
       "type": "string",
       "metadata": {
@@ -59,7 +65,11 @@
     "secGroup1Name": "[concat(parameters('virtualNetworkName'),'-',parameters('subnet1Name'),'-nsg')]",
     "secGroup2Name": "[concat(parameters('virtualNetworkName'),'-',parameters('subnet2Name'),'-nsg')]",
     "nsgFETemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NSG_FrontEndBE.json')]",
-    "nsgBETemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NSG_BackEnd.json')]"
+    "nsgBETemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NSG_BackEnd.json')]",
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/GatewaySubnet')]",
+    "gatewayName": "[concat(parameters('virtualNetworkName'),'-gw')]",
+    "gatewayPublicIPName": "[concat(variables('gatewayName'),'-ip')]",
+    "gatewayIPConf": "[concat(variables('gatewayName'),'-ipconf')]"
   },
   "resources": [
     {
@@ -156,8 +166,52 @@
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('secGroup2Name'))]"
               }
             }
+          },
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gwSubnetAddrPrefix')]"
+            }
           }
         ]
+      }
+    },
+    {
+      "name": "[variables('gatewayPublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "name": "[variables('gatewayName')]",
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Network','virtualNetworkGateways').apiVersions[0]]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('gatewaySubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('gatewayPublicIPName'))]"
+              }
+            },
+            "name": "[variables('gatewayIPConf')]"
+          }
+        ],
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "enableBgp": "false"
       }
     }
   ]

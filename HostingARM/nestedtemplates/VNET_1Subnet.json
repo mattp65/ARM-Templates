@@ -50,7 +50,7 @@
     {
       "name": "CreateNSG",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-09-01",
+      "apiVersion": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
       "dependsOn": [
       ],
       "properties": {
@@ -76,7 +76,7 @@
       "name": "[parameters('virtualNetworkName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
       "dependsOn": [
         "Microsoft.Resources/deployments/CreateNSG"
       ],

@@ -50,7 +50,7 @@ function create-DCJOB {
 }
 
 
-$Suffix  ="t"
+$Suffix  ="s"
 $dnsName ='parks65dc' + $Suffix
 
 $resourceGroup = 'dcTest' + $Suffix

@@ -270,7 +270,7 @@
           "properties": {
             "publisher": "Microsoft.Powershell",
             "type": "DSC",
-            "typeHandlerVersion": "2.19",
+            "typeHandlerVersion": "2.23",
             "autoUpgradeMinorVersion": true,
             "settings": {
               "ModulesUrl": "[variables('adPDCModulesURL')]",

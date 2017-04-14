@@ -1,64 +1,59 @@
-﻿function create-ARMJOB {
+﻿
+# Load generic Job starter
+. C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\StartARMJob.ps1
+
+function tmpcreate-job{
     [cmdletbinding()]
-    Param($dnsPrefix, $Suffix, $vlanRGName, $vlanName, $subnetName)
+    Param($resourceGroup, $vmName, $dnsName, $vlanRGName, $vlanName, $subnetName)
 
-    $resourceGroup ="$rgPrefix$Suffix"
-    $scriptBlock = {
-        param($resourceGroup, $dnsPrefix, $Suffix, $vlanRGName, $vlanName, $subnetName)
+    write-host "$resourceGroup $vmName $dnsName"
 
-        $SubscriptionName = 'aVisual Studio Ultimate with MSDN'
-        $TenantId = '88b84882-dd0c-4637-8524-eaa033ca7305'
+    $templatePath      = 'C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\simple-vm2NoIP.json'
+    $parameterFilePath = "C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\simple-vm2NoIP.parameters.json"
+    $location = 'South Central US'
 
-        $user = "scripts@parks65.com"
-        $pw = ConvertTo-SecureString "Caviar!65" -AsPlainText -Force
-        $Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pw
+    $tmpFilePath = "$parameterFilePath.$vmName.json"
 
-        $Account = Add-AzureRmAccount -Credential $Cred
-        $subout = Get-AzureRmSubscription -SubscriptionName $SubscriptionName -TenantId $TenantId  | Select-AzureRmSubscription
+    # Override the configurable job parms for just thie job
+    $jobParms = Get-Content $parameterFilePath | Out-String | ConvertFrom-Json
 
+    $jobParms.parameters.vmName.value = $vmName
+#    $jobParms.parameters.dnsName.value = $dnsName
+    $jobParms.parameters.vlanRGName.value = $vlanRGName
+    $jobParms.parameters.vlanName.value = $vlanName
+    $jobParms.parameters.subnetName.value = $subnetName
 
+    ConvertTo-Json -InputObject $jobParms -Depth 30 -Compress | Out-File $tmpFilePath -Encoding utf8
 
-        $templatePath      = 'C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\simple-vm2.json'
-        $parameterFilePath = "C:\GitHub\ARM-Templates\HostingARM\SampleTemplates\simple-vm2.parameters.json"
-        $adminUsername = "parksadmin"
-        $deploymentName = 'DomainARM'
-        $location = 'East US'
-
-        $tmpFilePath = $parameterFilePath + "$resourceGroup.json"
-
-        # Override the configurable job parms for just thie job
-        $jobParms = Get-Content $parameterFilePath | Out-String | ConvertFrom-Json
-
-        $jobParms.parameters.vmName.value = $dnsPrefix + $Suffix
-        $jobParms.parameters.dnsName.value = $dnsPrefix + $Suffix
-        $jobParms.parameters.vlanRGName.value = $vlanRGName
-        $jobParms.parameters.vlanName.value = $vlanName
-        $jobParms.parameters.subnetName.value = $subnetName
-
-        ConvertTo-Json -InputObject $jobParms -Depth 30 -Compress | Out-File $tmpFilePath -Encoding utf8
-
-
-
-
-        get-date -Format 'yyyy-MM-dd hh:mm:ss'
-
-        New-AzureRmResourceGroup -Name $resourceGroup -Location $location -Verbose -Force
-
-        get-date -Format 'yyyy-MM-dd hh:mm:ss'
-
-        New-AzureRmResourceGroupDeployment -Name $deploymentName -ResourceGroupName $resourceGroup -TemplateFile $templatePath -TemplateParameterFile $tmpFilePath 
-
-        get-date -Format 'yyyy-MM-dd hh:mm:ss'
-        
-    }
-
-    Start-Job –Name "C$resourceGroup" –Scriptblock $scriptBlock -ArgumentList $resourceGroup, $dnsPrefix, $Suffix, $vlanRGName, $vlanName, $subnetName
+    $jobName = "simple-vm2NoIP-$vmName"
+    start-armjobparmfile $resourceGroup $location $jobName $templatePath $tmpFilePath
 }
 
+$runId = 'V'
 
-$rgPrefix = 'adTestVM'
-$dnsPrefix='parks65A'
+$resourceGroup = "adTestVM$runId"
+$dnsPrefix     = "parks65$runId"
 
-create-ARMJOB $dnsPrefix 'BEo' 'NetworkRGCompA' 'VNetCompA' 'BackEnd'
+tmpcreate-job $resourceGroup "$($dnsPrefix)A" "$($dnsPrefix)A" 'adTestNetA' 'CompA-vnet' 'FrontEnd'
+tmpcreate-job $resourceGroup "$($dnsPrefix)B" "$($dnsPrefix)B" 'adTestNetA' 'CompA-vnet' 'FrontEnd'
 
+
+
+
+#get-job | Remove-Job
+#get-job | Remove-Job
+
+$jobs = get-job | Where { $_.State -eq "Running" }
+While ($jobs.Count -ne 0) {
+    Write-Host "$(get-date -Format 'hh:mm:ss') Waiting for $($jobs.Count) background jobs..."
+    Start-Sleep -Seconds 10
+    $jobs = get-job | Where { $_.State -eq "Running" }
+}
+
+foreach ($job in get-job) {
+    write-host $job.Name 
+    receive-job $job
+    remove-job $job
+    write-host $job.Name 
+}
 

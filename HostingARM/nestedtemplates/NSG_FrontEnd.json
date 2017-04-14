@@ -26,10 +26,10 @@
   },
   "resources": [
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[parameters('secGroupName')]",
+      "type": "Microsoft.Network/networkSecurityGroups",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Network','networkSecurityGroups').apiVersions[0]]",
       "properties": {
         "securityRules": [
           {

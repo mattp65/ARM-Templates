@@ -14,17 +14,17 @@
         "description": "Address space for the VNET."
       }
     },
-    "subnet1Name": {
+    "subnetName": {
       "type": "string",
       "defaultValue": "FrontEnd",
       "metadata": {
-        "description": "Name of the first subnet in the VNET. Please note, an additional subnet called GatewaySubnet will be created where the VirtualNetworkGateway will be deployed. The name of that subnet must not be changed from GatewaySubnet."
+        "description": "Name of the subnet in the VNET."
       }
     },
-    "subnet1AddrPrefix": {
+    "subnetAddrPrefix": {
       "type": "string",
       "metadata": {
-        "description": "The prefix for the first subnet in the VNET."
+        "description": "The prefix for the subnet in the VNET."
       }
     },
     "dnsAddress": {
@@ -38,11 +38,19 @@
       "metadata": {
         "description": "The prefix for the GatewaySubnet where the VirtualNetworkGateway will be deployed. This must be at least /29."
       }
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The location of resources, such as templates and DSC modules, that the template depends on"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/mattp65/ARM-Templates/master/HostingARM"
     }
   },
   "variables": {
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "secGroup1Name": "[concat(parameters('virtualNetworkName'),'-',parameters('subnet1Name'),'-nsg')]",
+    "secGroupName": "[concat(parameters('virtualNetworkName'),'-',parameters('subnetName'),'-nsg')]",
+    "nsgTemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NSG_FrontEnd.json')]",
     "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/GatewaySubnet')]",
     "gatewayName": "[concat(parameters('virtualNetworkName'),'-gw')]",
     "gatewayPublicIPName": "[concat(variables('gatewayName'),'-ip')]",
@@ -50,64 +58,37 @@
   },
   "resources": [
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "name": "[variables('secGroup1Name')]",
-      "location": "[resourceGroup().location]",
+      "name": "CreateNSG",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+      "dependsOn": [
+      ],
       "properties": {
-        "securityRules": [
-          {
-            "name": "webrule",
-            "properties": {
-              "description": "This rule allows traffic in on port 80",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "80",
-              "sourceAddressPrefix": "INTERNET",
-              "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
-              "access": "Allow",
-              "priority": 100,
-              "direction": "Inbound"
-            }
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nsgTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "secGroupName": {
+            "value": "[variables('secGroupName')]"
           },
-          {
-            "name": "httpsrule",
-            "properties": {
-              "description": "This rule allows traffic in on port 443",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "443",
-              "sourceAddressPrefix": "INTERNET",
-              "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
-              "access": "Allow",
-              "priority": 110,
-              "direction": "Inbound"
-            }
+          "subnetAddrPrefix": {
+            "value": "[parameters('subnetAddrPrefix')]"
           },
-          {
-            "name": "rdprule",
-            "properties": {
-              "description": "This rule allows traffic on port 3389 from the web",
-              "protocol": "Tcp",
-              "sourcePortRange": "*",
-              "destinationPortRange": "3389",
-              "sourceAddressPrefix": "*",
-              "destinationAddressPrefix": "[parameters('subnet1AddrPrefix')]",
-              "access": "Allow",
-              "priority": 200,
-              "direction": "Inbound"
-            }
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
           }
-        ]
+        }
       }
     },
     {
       "name": "[parameters('virtualNetworkName')]",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[providers('Microsoft.Network','virtualNetworks').apiVersions[0]]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('secGroup1Name'))]"
+        "Microsoft.Resources/deployments/CreateNSG"
       ],
       "properties": {
         "addressSpace": {
@@ -122,11 +103,11 @@
         },
         "subnets": [
           {
-            "name": "[parameters('subnet1Name')]",
+            "name": "[parameters('subnetName')]",
             "properties": {
-              "addressPrefix": "[parameters('subnet1AddrPrefix')]",
+              "addressPrefix": "[parameters('subnetAddrPrefix')]",
               "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('secGroup1Name'))]"
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('secGroupName'))]"
               }
             }
           },
@@ -140,19 +121,19 @@
       }
     },
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('gatewayPublicIPName')]",
+      "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Network','publicIPAddresses').apiVersions[0]]",
       "properties": {
         "publicIPAllocationMethod": "Dynamic"
       }
     },
     {
-      "apiVersion": "2015-06-15",
-      "type": "Microsoft.Network/virtualNetworkGateways",
       "name": "[variables('gatewayName')]",
+      "type": "Microsoft.Network/virtualNetworkGateways",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Network','virtualNetworkGateways').apiVersions[0]]",
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
         "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"

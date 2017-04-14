@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the Virtual Machine."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -12,18 +18,6 @@
       "type": "securestring",
       "metadata": {
         "description": "Password for the Virtual Machine."
-      }
-    },
-    "vmName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name for the Virtual Machine."
-      }
-    },
-    "dnsName": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
     },
     "vlanRGName": {
@@ -46,6 +40,7 @@
     },
     "adVMSize": {
       "type": "string",
+      "defaultValue": "Standard_A2",
       "allowedValues": [
         "Standard_A2",
         "Standard_A3",
@@ -59,8 +54,7 @@
       ],
       "metadata": {
         "description": "The size of the VM Created"
-      },
-      "defaultValue": "Standard_A2"
+      }
     },
     "windowsOSVersion": {
       "type": "string",
@@ -71,6 +65,13 @@
       ],
       "metadata": {
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+      }
+    },
+    "dataDiskSize": {
+      "type": "int",
+      "defaultValue": 25,
+      "metadata": {
+        "description": "Size (GB) for the Data disk."
       }
     },
     "_artifactsLocation": {
@@ -84,27 +85,15 @@
   "variables": {
     "vmStorAcctName": "[take(concat(toLower(parameters('vmName')), 'st',uniquestring(resourceGroup().id)),24)]",
     "diagStorAcctName": "[take(concat(toLower(resourceGroup().name), 'stdiag'),24)]",
-    "pubIPName": "[concat(parameters('vmName'), '-pip')]",
-    "nicName": "[concat(parameters('vmName'), '-nic')]",
-    "subnetID": "[resourceId(parameters('vlanRGName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vlanName'), parameters('subnetName'))]"
+    "subnetID": "[resourceId(parameters('vlanRGName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vlanName'), parameters('subnetName'))]",
+    "nicTemplateURI": "[concat(parameters('_artifactsLocation'), '/nestedtemplates/NIC_DynamicNoPIP.json')]"
   },
   "resources": [
     {
-      "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('vmStorAcctName')]",
-      "apiVersion": "2016-01-01",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Standard_LRS"
-      },
-      "kind": "Storage",
-      "properties": {}
-    },
-    {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('diagStorAcctName')]",
-      "apiVersion": "2016-01-01",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]",
       "sku": {
         "name": "Standard_LRS"
       },
@@ -112,51 +101,50 @@
       "properties": {}
     },
     {
-      "apiVersion": "2016-03-30",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('pubIPName')]",
+      "name": "[variables('diagStorAcctName')]",
+      "type": "Microsoft.Storage/storageAccounts",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage",
+      "properties": {}
+    },
+    {
+      "name": "[concat('CreateNIC-',parameters('vmName'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[providers('Microsoft.Resources','deployments').apiVersions[0]]",
+      "dependsOn": [
+      ],
       "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "dnsSettings": {
-          "domainNameLabel": "[toLower(parameters('dnsName'))]"
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nicTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "subnetID": {
+            "value": "[variables('subnetID')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          }
         }
       }
     },
     {
-      "apiVersion": "2016-03-30",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('pubIPName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pubIPName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetID')]"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2016-04-30-preview",
-      "type": "Microsoft.Compute/virtualMachines",
       "name": "[parameters('vmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
       "location": "[resourceGroup().location]",
+      "apiVersion": "[providers('Microsoft.Compute','virtualMachines').apiVersions[0]]",
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('vmStorAcctName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagStorAcctName'))]",
-        "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+        "[concat('Microsoft.Resources/deployments/CreateNIC-',parameters('vmName'))]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -184,7 +172,7 @@
           "dataDisks": [
             {
               "name": "[concat(parameters('vmName'),'-data1')]",
-              "diskSizeGB": "25",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
               "lun": 0,
               "createOption": "Empty",
               "vhd": {
@@ -196,7 +184,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',reference(concat('CreateNIC-',parameters('vmName'))).outputs.nicName.value)]"
             }
           ]
         },
@@ -212,7 +200,7 @@
   "outputs": {
     "hostname": {
       "type": "string",
-      "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('pubIPName')), '2017-04-01').dnsSettings.fqdn]"
+      "value": "[reference(concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))).osProfile.computerName]"
     }
   }
 }
